@@ -2,6 +2,8 @@
 
 ### Features
 
+1. [12523](https://github.com/influxdata/influxdb/pull/12523): Add ability to save a query as a variable from the Data Explorer.
+
 ### Bug Fixes
 
 ### UI Improvements
