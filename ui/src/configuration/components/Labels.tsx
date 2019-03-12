@@ -11,7 +11,7 @@ import {
   ComponentSize,
   ComponentColor,
 } from '@influxdata/clockface'
-import {EmptyState, Input, InputType} from 'src/clockface'
+import {EmptyState, Input, InputType, OverlayState} from 'src/clockface'
 import LabelList from 'src/configuration/components/LabelList'
 import FilterList from 'src/shared/components/Filter'
 
@@ -35,7 +35,7 @@ interface StateProps {
 
 interface State {
   searchTerm: string
-  isOverlayVisible: boolean
+  isOverlayVisible: OverlayState
 }
 
 interface DispatchProps {
@@ -54,7 +54,7 @@ class Labels extends PureComponent<Props, State> {
 
     this.state = {
       searchTerm: '',
-      isOverlayVisible: false,
+      isOverlayVisible: OverlayState.Hide,
     }
   }
 
@@ -96,7 +96,7 @@ class Labels extends PureComponent<Props, State> {
           )}
         </FilterList>
         <CreateLabelOverlay
-          isVisible={isOverlayVisible}
+          visible={isOverlayVisible}
           onDismiss={this.handleDismissOverlay}
           onCreateLabel={this.handleCreateLabel}
           onNameValidation={this.handleNameValidation}
@@ -106,11 +106,11 @@ class Labels extends PureComponent<Props, State> {
   }
 
   private handleShowOverlay = (): void => {
-    this.setState({isOverlayVisible: true})
+    this.setState({isOverlayVisible: OverlayState.Show})
   }
 
   private handleDismissOverlay = (): void => {
-    this.setState({isOverlayVisible: false})
+    this.setState({isOverlayVisible: OverlayState.Hide})
   }
 
   private handleFilterChange = (e: ChangeEvent<HTMLInputElement>): void => {

@@ -9,12 +9,12 @@ import {
   IconFont,
   ComponentColor,
 } from '@influxdata/clockface'
+import {OverlayState} from 'src/clockface'
 import InlineLabelPopover from 'src/shared/components/inlineLabels/InlineLabelPopover'
 import CreateLabelOverlay from 'src/configuration/components/CreateLabelOverlay'
 
 // Types
 import {ILabel} from '@influxdata/influx'
-import {OverlayState} from 'src/types/overlay'
 
 // Utils
 import {validateLabelUniqueness} from 'src/configuration/utils/labels'
@@ -55,7 +55,7 @@ class InlineLabelsEditor extends Component<Props, State> {
       searchTerm: '',
       filteredLabels: initialFilteredLabels,
       isPopoverVisible: false,
-      isCreatingLabel: OverlayState.Closed,
+      isCreatingLabel: OverlayState.Hide,
     }
   }
 
@@ -79,7 +79,7 @@ class InlineLabelsEditor extends Component<Props, State> {
           {this.noLabelsIndicator}
         </div>
         <CreateLabelOverlay
-          isVisible={isCreatingLabel === OverlayState.Open}
+          visible={isCreatingLabel}
           onDismiss={this.handleStopCreatingLabel}
           overrideDefaultName={searchTerm}
           onCreateLabel={this.handleCreateLabel}
@@ -208,12 +208,12 @@ class InlineLabelsEditor extends Component<Props, State> {
   }
 
   private handleStartCreatingLabel = (): void => {
-    this.setState({isCreatingLabel: OverlayState.Open})
+    this.setState({isCreatingLabel: OverlayState.Show})
     this.handleDismissPopover()
   }
 
   private handleStopCreatingLabel = (): void => {
-    this.setState({isCreatingLabel: OverlayState.Closed})
+    this.setState({isCreatingLabel: OverlayState.Hide})
   }
 
   private handleEnsureUniqueLabelName = (name: string): string | null => {

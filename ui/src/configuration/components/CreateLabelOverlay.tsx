@@ -3,7 +3,7 @@ import React, {Component, ChangeEvent} from 'react'
 
 // Components
 import LabelOverlayForm from 'src/configuration/components/LabelOverlayForm'
-import {Overlay, ComponentStatus} from 'src/clockface'
+import {Overlay, ComponentStatus, OverlayState} from 'src/clockface'
 
 // Types
 import {ILabel} from '@influxdata/influx'
@@ -15,7 +15,7 @@ import {EMPTY_LABEL} from 'src/configuration/constants/LabelColors'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
-  isVisible: boolean
+  visible: OverlayState
   onDismiss: () => void
   onCreateLabel: (label: ILabel) => void
   onNameValidation: (name: string) => string | null
@@ -41,7 +41,7 @@ class CreateLabelOverlay extends Component<Props, State> {
   componentDidUpdate(prevProps) {
     if (
       prevProps.overrideDefaultName !== this.props.overrideDefaultName &&
-      this.props.isVisible === false
+      this.props.visible === OverlayState.Hide
     ) {
       const name = this.props.overrideDefaultName
       const label = {...this.state.label, name}
@@ -51,29 +51,27 @@ class CreateLabelOverlay extends Component<Props, State> {
   }
 
   public render() {
-    const {isVisible, onDismiss, onNameValidation} = this.props
+    const {visible, onDismiss, onNameValidation} = this.props
     const {label} = this.state
 
     return (
-      <Overlay visible={isVisible}>
-        <Overlay.Container maxWidth={400}>
-          <Overlay.Heading title="Create Label" onDismiss={onDismiss} />
-          <Overlay.Body>
-            <LabelOverlayForm
-              id={label.id}
-              name={label.name}
-              description={label.properties.description}
-              color={label.properties.color}
-              onColorChange={this.handleColorChange}
-              onSubmit={this.handleSubmit}
-              onCloseModal={onDismiss}
-              onInputChange={this.handleInputChange}
-              buttonText="Create Label"
-              isFormValid={this.isFormValid}
-              onNameValidation={onNameValidation}
-            />
-          </Overlay.Body>
-        </Overlay.Container>
+      <Overlay visible={visible} maxWidth={400}>
+        <Overlay.Heading title="Create Label" onDismiss={onDismiss} />
+        <Overlay.Body>
+          <LabelOverlayForm
+            id={label.id}
+            name={label.name}
+            description={label.properties.description}
+            color={label.properties.color}
+            onColorChange={this.handleColorChange}
+            onSubmit={this.handleSubmit}
+            onCloseModal={onDismiss}
+            onInputChange={this.handleInputChange}
+            buttonText="Create Label"
+            isFormValid={this.isFormValid}
+            onNameValidation={onNameValidation}
+          />
+        </Overlay.Body>
       </Overlay>
     )
   }
