@@ -10,7 +10,7 @@ import Input, {InputType, AutoComplete} from './components/inputs/Input'
 import MultipleInput, {
   MultiInputType,
 } from './components/inputs/multipleInput/MultipleInput'
-import Overlay from './components/overlays/Overlay'
+import Overlay, {OverlayState} from './components/overlays/Overlay'
 import Panel from './components/panel/Panel'
 import Radio from './components/radio_buttons/RadioButtons'
 import WizardFullScreen from './components/wizard/WizardFullScreen'
@@ -85,6 +85,7 @@ export {
   MultiInputType,
   MultipleInput,
   Overlay,
+  OverlayState,
   Panel,
   ProgressBar,
   QuestionMarkTooltip,

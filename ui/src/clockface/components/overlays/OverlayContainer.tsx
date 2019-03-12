@@ -1,38 +1,24 @@
-import React, {Component, ReactNode, CSSProperties} from 'react'
-import classnames from 'classnames'
+// Libraries
+import React, {SFC} from 'react'
 
 interface Props {
-  children: ReactNode
-  maxWidth?: number
-  customClass?: string
+  children: JSX.Element | JSX.Element[]
+  maxWidth: number
+  testID: string
 }
 
-class OverlayContainer extends Component<Props> {
-  public static defaultProps: Partial<Props> = {
-    maxWidth: 800,
-  }
+const OverlayContainer: SFC<Props> = ({children, maxWidth, testID}) => {
+  const style = {maxWidth: `${maxWidth}px`}
 
-  public render() {
-    const {children, customClass} = this.props
-
-    return (
-      <div
-        className={classnames('overlay--container', {
-          [`${customClass}`]: customClass,
-        })}
-        data-testid="overlay--container"
-        style={this.style}
-      >
-        {children}
-      </div>
-    )
-  }
-
-  private get style(): CSSProperties {
-    const {maxWidth} = this.props
-
-    return {maxWidth: `${maxWidth}px`}
-  }
+  return (
+    <div
+      className="overlay--container"
+      data-testid={`${testID}--container`}
+      style={style}
+    >
+      {children}
+    </div>
+  )
 }
 
 export default OverlayContainer

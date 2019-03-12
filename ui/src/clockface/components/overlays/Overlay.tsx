@@ -15,9 +15,24 @@ import 'src/clockface/components/overlays/Overlay.scss'
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface Props {
-  children: JSX.Element
-  visible: boolean
+interface PassedProps {
+  children: JSX.Element | JSX.Element[]
+  visible: OverlayState
+}
+
+interface DefaultProps {
+  maxWidth?: number
+  testID?: string
+  customOverlay?: boolean
+  scrollable?: boolean
+  className?: string
+}
+
+type Props = PassedProps & DefaultProps
+
+export enum OverlayState {
+  Show = 'overlay--show',
+  Hide = 'overlay--hide',
 }
 
 interface State {
@@ -26,6 +41,13 @@ interface State {
 
 @ErrorHandling
 class Overlay extends Component<Props, State> {
+  public static defaultProps: DefaultProps = {
+    maxWidth: 800,
+    testID: 'overlay',
+    customOverlay: false,
+    scrollable: true,
+  }
+
   public static Container = OverlayContainer
   public static Heading = OverlayHeading
   public static Body = OverlayBody
@@ -49,48 +71,77 @@ class Overlay extends Component<Props, State> {
     }
   }
 
-  public componentDidUpdate(prevProps) {
-    if (prevProps.visible && !this.props.visible) {
+  public componentDidUpdate(prevProps: Props) {
+    if (
+      prevProps.visible === OverlayState.Show &&
+      this.props.visible === OverlayState.Hide
+    ) {
       clearTimeout(this.animationTimer)
       this.animationTimer = window.setTimeout(this.hideChildren, 300)
     }
   }
 
   public render() {
-    return (
-      <FancyScrollbar
-        className={this.overlayClass}
-        thumbStartColor="#ffffff"
-        thumbStopColor="#C9D0FF"
-        autoHide={false}
-      >
-        {this.childContainer}
-        <div className="overlay--mask" />
-      </FancyScrollbar>
-    )
-  }
+    const {scrollable, testID} = this.props
 
-  private get childContainer(): JSX.Element {
-    const {children} = this.props
-    const {showChildren} = this.state
-
-    if (showChildren) {
+    if (scrollable) {
       return (
-        <div className="overlay--transition" data-testid="overlay-children">
-          {children}
-        </div>
+        <FancyScrollbar
+          className={this.className}
+          thumbStartColor="#ffffff"
+          thumbStopColor="#C9D0FF"
+          autoHide={false}
+        >
+          <div
+            className="overlay--transition"
+            data-testid={`${testID}--children`}
+          >
+            {this.children}
+          </div>
+          <div className="overlay--mask" />
+        </FancyScrollbar>
       )
     }
 
     return (
-      <div className="overlay--transition" data-testid="overlay-children" />
+      <div className={this.className}>
+        <div
+          className="overlay--transition"
+          data-testid={`${testID}--children`}
+        >
+          {this.children}
+        </div>
+        <div className="overlay--mask" />
+      </div>
     )
   }
 
-  private get overlayClass(): string {
-    const {visible} = this.props
+  private get children(): JSX.Element | JSX.Element[] {
+    const {children, customOverlay, maxWidth, testID} = this.props
+    const {showChildren} = this.state
 
-    return classnames('overlay', {show: visible})
+    if (!showChildren) {
+      return null
+    }
+
+    if (customOverlay) {
+      return children
+    }
+
+    return (
+      <OverlayContainer maxWidth={maxWidth} testID={testID}>
+        {children}
+      </OverlayContainer>
+    )
+  }
+
+  private get className(): string {
+    const {visible, className} = this.props
+
+    return classnames('overlay', {
+      show: visible === OverlayState.Show,
+      [`${className}`]: className,
+    })
   }
 
   private hideChildren = (): void => {
