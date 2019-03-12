@@ -2,7 +2,7 @@
 import React, {PureComponent} from 'react'
 
 // Components
-import {IndexList, Overlay} from 'src/clockface'
+import {IndexList, OverlayState} from 'src/clockface'
 import UpdateLabelOverlay from 'src/configuration/components/UpdateLabelOverlay'
 import LabelRow from 'src/configuration/components/LabelRow'
 
@@ -11,7 +11,6 @@ import {validateLabelUniqueness} from 'src/configuration/utils/labels'
 
 // Types
 import {ILabel} from '@influxdata/influx'
-import {OverlayState} from 'src/types'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -32,10 +31,12 @@ interface State {
 export default class LabelList extends PureComponent<Props, State> {
   public state: State = {
     labelID: null,
-    overlayState: OverlayState.Closed,
+    overlayState: OverlayState.Hide,
   }
 
   public render() {
+    const {overlayState} = this.state
+
     return (
       <>
         <IndexList>
@@ -48,14 +49,13 @@ export default class LabelList extends PureComponent<Props, State> {
             {this.rows}
           </IndexList.Body>
         </IndexList>
-        <Overlay visible={this.isOverlayVisible}>
-          <UpdateLabelOverlay
-            label={this.label}
-            onDismiss={this.handleCloseModal}
-            onUpdateLabel={this.handleUpdateLabel}
-            onNameValidation={this.handleNameValidation}
-          />
-        </Overlay>
+        <UpdateLabelOverlay
+          visible={overlayState}
+          label={this.label}
+          onDismiss={this.handleCloseModal}
+          onUpdateLabel={this.handleUpdateLabel}
+          onNameValidation={this.handleNameValidation}
+        />
       </>
     )
   }
@@ -80,21 +80,16 @@ export default class LabelList extends PureComponent<Props, State> {
   }
 
   private handleCloseModal = () => {
-    this.setState({overlayState: OverlayState.Closed})
+    this.setState({overlayState: OverlayState.Hide})
   }
 
   private handleStartEdit = (labelID: string): void => {
-    this.setState({labelID, overlayState: OverlayState.Open})
-  }
-
-  private get isOverlayVisible(): boolean {
-    const {labelID, overlayState} = this.state
-    return !!labelID && overlayState === OverlayState.Open
+    this.setState({labelID, overlayState: OverlayState.Show})
   }
 
   private handleUpdateLabel = async (updatedLabel: ILabel) => {
     await this.props.onUpdateLabel(updatedLabel)
-    this.setState({overlayState: OverlayState.Closed})
+    this.setState({overlayState: OverlayState.Hide})
   }
 
   private handleNameValidation = (name: string): string | null => {

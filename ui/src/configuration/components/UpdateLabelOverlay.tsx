@@ -1,9 +1,10 @@
 // Libraries
 import React, {Component, ChangeEvent} from 'react'
+import _ from 'lodash'
 
 // Components
 import LabelOverlayForm from 'src/configuration/components/LabelOverlayForm'
-import {Overlay} from 'src/clockface'
+import {Overlay, OverlayState} from 'src/clockface'
 import {ComponentStatus} from '@influxdata/clockface'
 
 // Types
@@ -17,6 +18,7 @@ interface Props {
   onDismiss: () => void
   onUpdateLabel: (label: ILabel) => Promise<void>
   onNameValidation: (name: string) => string | null
+  visible: OverlayState
 }
 
 interface State {
@@ -35,12 +37,22 @@ class UpdateLabelOverlay extends Component<Props, State> {
     }
   }
 
+  public componentDidUpdate(prevProps: Props) {
+    if (!_.isEqual(prevProps.label, this.props.label)) {
+      this.setState({label: this.props.label})
+    }
+  }
+
   public render() {
-    const {onDismiss, onNameValidation} = this.props
+    const {onDismiss, onNameValidation, visible} = this.props
     const {label} = this.state
 
+    if (!label) {
+      return null
+    }
+
     return (
-      <Overlay.Container maxWidth={400}>
+      <Overlay maxWidth={400} visible={visible}>
         <Overlay.Heading title="Edit Label" onDismiss={onDismiss} />
         <Overlay.Body>
           <LabelOverlayForm
@@ -57,7 +69,7 @@ class UpdateLabelOverlay extends Component<Props, State> {
             onNameValidation={onNameValidation}
           />
         </Overlay.Body>
-      </Overlay.Container>
+      </Overlay>
     )
   }
 
